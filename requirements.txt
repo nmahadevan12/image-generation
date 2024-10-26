@@ -1,4 +1,4 @@
 streamlit>=1.0.0
 torch>=2.0.0
 diffusers>=0.10.0
-transformers>=4.0.0  # Ensure transformers is included
+transformers>=4.0.0
