@@ -19,7 +19,7 @@ def main():
     prompt = st.text_input("Enter your prompt here:", "A beautiful landscape")
 
     # Button to generate the image
-    if st.button("AI Generate Image"):
+    if st.button("Image Generation"):
         if prompt:
             with st.spinner("Generating image..."):
                 try:
