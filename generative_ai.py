@@ -1,26 +1,27 @@
 import streamlit as st
-from diffusers import StableDiffusionPipeline
+from diffusers import StableDiffusionPipeline, DDIMScheduler
 import torch
 import os
 
 # Set MPS high watermark to disable memory limit if using macOS
 os.environ['PYTORCH_MPS_HIGH_WATERMARK_RATIO'] = '0.0'
 
-# Load the model with appropriate precision
+# Load the model with the desired scheduler
 @st.cache_resource
 def load_pipeline():
     st.write("Loading model...")
     if torch.cuda.is_available():
-        # Load with float16 for GPU
         pipeline = StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5", torch_dtype=torch.float16)
         pipeline = pipeline.to("cuda")
     else:
-        # Load with float32 for CPU
         pipeline = StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5", torch_dtype=torch.float32)
         pipeline = pipeline.to("cpu")
-        
+
+    # Replace the scheduler with DDIMScheduler for faster image generation
+    pipeline.scheduler = DDIMScheduler.from_config(pipeline.scheduler.config)
     st.write("Model loaded successfully!")
     return pipeline
+
 
 # Load the pipeline
 pipeline = load_pipeline()
