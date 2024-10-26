@@ -5,12 +5,15 @@ from accelerate import infer_auto_device_map
 
 @st.cache_resource
 def load_pipeline():
-    model_name = "CompVis/stable-diffusion-v-1-4"  # Replace with your model name
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    # Load the pipeline without device map
-    pipeline = StableDiffusionPipeline.from_pretrained(model_name)
-    return pipeline
-
+    model_name = "CompVis/stable-diffusion-v-1-4"  # Replace with your valid model name
+    try:
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        pipeline = StableDiffusionPipeline.from_pretrained(model_name)
+        return pipeline
+    except EnvironmentError as e:
+        st.error(f"Failed to load model: {e}")
+        return None
+        
 def main():
     st.title("Image Generation ")
     pipeline = load_pipeline()
