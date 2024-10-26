@@ -12,7 +12,7 @@ def load_pipeline():
     return pipeline
 
 def main():
-    st.title("AI Image Generation ")
+    st.title("Image Generation ")
     pipeline = load_pipeline()
 
     # Add a text input box for the prompt
