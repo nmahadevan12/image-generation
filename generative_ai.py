@@ -11,7 +11,7 @@ os.environ['PYTORCH_MPS_HIGH_WATERMARK_RATIO'] = '0.0'
 def load_pipeline():
     st.write("Loading model...")
     pipeline = StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5", torch_dtype=torch.float16)
-    pipeline = pipeline.to("mps")  # Set to MPS for Apple Silicon
+    pipeline = pipeline.to("cuda") if torch.cuda.is_available() else pipeline.to("cpu")
     st.write("Model loaded successfully!")
     return pipeline
 
