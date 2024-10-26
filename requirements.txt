@@ -2,4 +2,5 @@ streamlit>=1.0.0
 torch>=2.0.0
 diffusers>=0.10.0
 transformers>=4.0.0
-Pillow>=9.0.0  # Add Pillow for image handling
+accelerate>=0.20.0  
+Pillow>=9.0.0  
