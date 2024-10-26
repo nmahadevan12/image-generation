@@ -13,7 +13,7 @@ def load_pipeline():
 pipeline = load_pipeline()
 
 # Streamlit app
-st.title("Image Generation with Stable Diffusion")
+st.title("AI Image Generation")
 st.write("Enter a prompt to generate an image:")
 
 # Input from the user
