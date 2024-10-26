@@ -1,5 +1,5 @@
 streamlit
 torch==2.0.1
 diffusers
-transformers==4.34.0
+transformers>=4.22.0
 accelerate
