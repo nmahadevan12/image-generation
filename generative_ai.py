@@ -5,23 +5,26 @@ from accelerate import infer_auto_device_map
 
 @st.cache_resource
 def load_pipeline():
-    model_name = "your-model-name"  # Replace with your model name
+    model_name = "CompVis/stable-diffusion-v-1-4"  # Replace with your actual model name
     device_map = infer_auto_device_map(model_name)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     pipeline = StableDiffusionPipeline.from_pretrained(model_name, device_map=device_map)
     return pipeline
 
 def main():
-    st.title("Image Generation App")
+    st.title("AI Image Generation ")
     pipeline = load_pipeline()
 
-    prompt = st.text_input("Enter your prompt here", "A beautiful landscape")
+    # Add a text input box for the prompt
+    prompt = st.text_input("Enter your prompt here:", "A beautiful landscape")
 
+    # Button to generate the image
     if st.button("Generate Image"):
         if prompt:
             with st.spinner("Generating image..."):
                 try:
-                    image = pipeline(prompt).images[0]  # Adjust this line if necessary
+                    # Generate image based on the prompt
+                    image = pipeline(prompt).images[0]  
                     st.image(image, caption="Generated Image", use_column_width=True)
                 except Exception as e:
                     st.error(f"Error generating image: {e}")
@@ -30,3 +33,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
