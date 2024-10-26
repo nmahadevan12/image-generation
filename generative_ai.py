@@ -1,19 +1,3 @@
-import subprocess
-import sys
-
-def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-
-try:
-    import transformers
-except ImportError:
-    install("transformers")
-
-try:
-    import accelerate
-except ImportError:
-    install("accelerate")
-
 import streamlit as st
 from diffusers import StableDiffusionPipeline
 import torch
