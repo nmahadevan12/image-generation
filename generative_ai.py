@@ -5,10 +5,10 @@ from accelerate import infer_auto_device_map
 
 @st.cache_resource
 def load_pipeline():
-    model_name = "CompVis/stable-diffusion-v-1-4"  # Replace with your actual model name
-    device_map = infer_auto_device_map(model_name)
+    model_name = "CompVis/stable-diffusion-v-1-4"  # Replace with your model name
     tokenizer = AutoTokenizer.from_pretrained(model_name)
-    pipeline = StableDiffusionPipeline.from_pretrained(model_name, device_map=device_map)
+    # Load the pipeline without device map
+    pipeline = StableDiffusionPipeline.from_pretrained(model_name)
     return pipeline
 
 def main():
