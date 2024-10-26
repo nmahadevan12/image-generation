@@ -1,37 +1,32 @@
 import streamlit as st
+from transformers import AutoTokenizer
 from diffusers import StableDiffusionPipeline
-import torch
-from PIL import Image
-import gc
+from accelerate import infer_auto_device_map
 
 @st.cache_resource
 def load_pipeline():
-    pipeline = StableDiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4")
-    return pipeline.to("cpu")
+    model_name = "your-model-name"  # Replace with your model name
+    device_map = infer_auto_device_map(model_name)
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    pipeline = StableDiffusionPipeline.from_pretrained(model_name, device_map=device_map)
+    return pipeline
 
-# Load the pipeline
-pipeline = load_pipeline()
+def main():
+    st.title("Image Generation App")
+    pipeline = load_pipeline()
 
-# Streamlit app
-st.title("AI Image Generation")
-st.write("Enter a prompt to generate an image:")
+    prompt = st.text_input("Enter your prompt here", "A beautiful landscape")
 
-# Input from the user
-prompt = st.text_input("Prompt", "A fantasy landscape", max_chars=100)
+    if st.button("Generate Image"):
+        if prompt:
+            with st.spinner("Generating image..."):
+                try:
+                    image = pipeline(prompt).images[0]  # Adjust this line if necessary
+                    st.image(image, caption="Generated Image", use_column_width=True)
+                except Exception as e:
+                    st.error(f"Error generating image: {e}")
+        else:
+            st.warning("Please enter a valid prompt.")
 
-if st.button("Generate Image"):
-    with st.spinner("Generating..."):
-        with torch.no_grad():
-            image = pipeline(prompt).images[0]
-
-        # Resize if necessary
-        image = image.resize((512, 512))  # Resize to reduce memory
-
-        # Display the generated image
-        st.image(image, caption="Generated Image", use_column_width=True)
-
-        # Free memory
-        del image
-        gc.collect()
-
-st.write("This application uses the Stable Diffusion model for image generation.")
+if __name__ == "__main__":
+    main()
