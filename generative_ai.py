@@ -4,30 +4,30 @@ import torch
 import os
 
 # Set MPS high watermark to disable memory limit if using macOS
-os.environ['PYTORCH_MPS_HIGH_WATERMARK_RATIO'] = '0.0'
+if torch.backends.mps.is_available():
+    os.environ['PYTORCH_MPS_HIGH_WATERMARK_RATIO'] = '0.0'
 
 # Load the model with the desired scheduler
 @st.cache_resource
 def load_pipeline():
     st.write("Loading model...")
-    if torch.cuda.is_available():
-        pipeline = StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5", torch_dtype=torch.float16)
-        pipeline = pipeline.to("cuda")
-    else:
-        pipeline = StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5", torch_dtype=torch.float32)
-        pipeline = pipeline.to("cpu")
-
-    # Replace the scheduler with DDIMScheduler for faster image generation
+    precision = torch.float16 if torch.cuda.is_available() else torch.float32
+    pipeline = StableDiffusionPipeline.from_pretrained(
+        "runwayml/stable-diffusion-v1-5", torch_dtype=precision
+    )
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    pipeline = pipeline.to(device)
+    
+    # Replace scheduler with DDIMScheduler for faster generation
     pipeline.scheduler = DDIMScheduler.from_config(pipeline.scheduler.config)
     st.write("Model loaded successfully!")
     return pipeline
-
 
 # Load the pipeline
 pipeline = load_pipeline()
 
 # Reduce the number of inference steps for faster image generation
-pipeline.scheduler.set_timesteps(15)
+pipeline.scheduler.set_timesteps(10)  # Lowered for faster generation
 
 # Define a function to generate images at specified resolution
 def generate_image(prompt, height=512, width=512):
@@ -41,12 +41,12 @@ st.title("AI Image Generator")
 st.write("Generate images from descriptive text using AI.")
 
 # Input prompt from the user
-prompt = st.text_input("Enter a descriptive text prompt:", )
+prompt = st.text_input("Enter a descriptive text prompt:")
 
 # Slider for selecting image resolution
 st.write("Select the image resolution:")
-height = st.slider("Height (in pixels)", 256, 768, 512)
-width = st.slider("Width (in pixels)", 256, 768, 512)
+height = st.slider("Height (in pixels)", 256, 512, 384)  # Reduced max resolution
+width = st.slider("Width (in pixels)", 256, 512, 384)    # Reduced max resolution
 
 # Button to generate the image
 if st.button("Generate Image"):
@@ -63,7 +63,7 @@ if st.button("Generate Image"):
         with open(filename, "rb") as file:
             st.download_button(
                 label="Download Image",
-                data=file,
+                data=file.read(),
                 file_name=filename,
                 mime="image/png"
             )
